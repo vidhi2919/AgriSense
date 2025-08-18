@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-// Leaflet CSS (safe in client components)
+// Keep CSS (runtime only; no type issues)
 import "leaflet/dist/leaflet.css";
 
 /* =======================
@@ -56,28 +56,33 @@ const API_BASE =
 
 /* =======================
    Leaflet Map (OSM) with BBox
-   - Uses dynamic import to avoid SSR
+   - No direct 'leaflet' import; avoids unused var + missing types.
 ======================= */
 const BBoxMap = dynamic(
   async () => {
-    const L = await import("leaflet");
     const { MapContainer, TileLayer, Rectangle, useMap } = await import("react-leaflet");
     const { useCallback, useEffect } = await import("react");
 
-    // Helper to fit bounds when bbox changes
-    function FitToBBox({ bounds }: { bounds: L.LatLngBoundsExpression }) {
+    // Minimal structural types to avoid depending on leaflet's types
+    type LatLngBoundsTuple = [[number, number], [number, number]];
+    type LeafletMouseEventLike = {
+      latlng: { lat: number; lng: number };
+      originalEvent: { shiftKey?: boolean };
+    };
+
+    function FitToBBox({ bounds }: { bounds: LatLngBoundsTuple }) {
       const map = useMap();
       useEffect(() => {
         try {
+          // @ts-expect-error react-leaflet map has fitBounds at runtime
           map.fitBounds(bounds, { padding: [20, 20] });
         } catch {
-          // ignore fit errors
+          /* noop */
         }
       }, [map, bounds]);
       return null;
     }
 
-    // Click-to-set corners: first click sets min corner, second click sets max corner
     function ClickToSetBBox({
       onChange,
       bbox,
@@ -87,19 +92,16 @@ const BBoxMap = dynamic(
     }) {
       const map = useMap();
       const setCorner = useCallback(
-        (e: L.LeafletMouseEvent) => {
-          // Shift-click = set min corner; Normal click = set max corner
+        (e: LeafletMouseEventLike) => {
           const lat = e.latlng.lat;
           const lng = e.latlng.lng;
           const [minX, minY, maxX, maxY] = bbox;
 
           if (e.originalEvent.shiftKey) {
-            // Set min corner
             const nminX = Math.min(lng, maxX - 0.0001);
             const nminY = Math.min(lat, maxY - 0.0001);
             onChange([nminX, nminY, maxX, maxY]);
           } else {
-            // Set max corner
             const nmaxX = Math.max(lng, minX + 0.0001);
             const nmaxY = Math.max(lat, minY + 0.0001);
             onChange([minX, minY, nmaxX, nmaxY]);
@@ -109,8 +111,10 @@ const BBoxMap = dynamic(
       );
 
       useEffect(() => {
+        // @ts-expect-error map.on exists at runtime
         map.on("click", setCorner);
         return () => {
+          // @ts-expect-error map.off exists at runtime
           map.off("click", setCorner);
         };
       }, [map, setCorner]);
@@ -128,14 +132,10 @@ const BBoxMap = dynamic(
       className?: string;
     }) {
       const [minX, minY, maxX, maxY] = bbox; // X=lon, Y=lat
-
-      // Leaflet wants [[south, west], [north, east]] i.e. [[minLat, minLng], [maxLat, maxLng]]
-      const bounds: L.LatLngBoundsExpression = [
+      const bounds: LatLngBoundsTuple = [
         [minY, minX],
         [maxY, maxX],
       ];
-
-      // Center is the bbox center
       const center: [number, number] = [(minY + maxY) / 2, (minX + maxX) / 2];
 
       return (
@@ -146,12 +146,11 @@ const BBoxMap = dynamic(
           scrollWheelZoom
         >
           <TileLayer
-            // OpenStreetMap Standard tiles
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors'
           />
           <Rectangle
-            bounds={bounds}
+            bounds={bounds as unknown as [[number, number], [number, number]]}
             pathOptions={{ color: "#16a34a", weight: 2, fillOpacity: 0.1 }}
           />
           <FitToBBox bounds={bounds} />
@@ -304,10 +303,7 @@ export default function ChatPage() {
       const msg = err instanceof Error ? err.message : "Unknown error";
       setMessages((m) => [
         ...m,
-        {
-          role: "assistant",
-          content: `Sorry — something went wrong: ${msg}`,
-        },
+        { role: "assistant", content: `Sorry — something went wrong: ${msg}` },
       ]);
     } finally {
       setIsSending(false);
