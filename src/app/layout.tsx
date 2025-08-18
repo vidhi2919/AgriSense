@@ -37,6 +37,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "AgriSense",
@@ -54,8 +55,16 @@ export default function RootLayout({
         {/* Navbar */}
         <nav className="flex justify-between items-center px-8 py-5 bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-green-600 rounded-full"></div>
-            <span className="font-bold text-xl tracking-tight">AgriSense</span>
+            <Image
+              src="/logo_final.png" 
+              alt="AgriSense"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <span className="font-bold text-xl tracking-tight text-green-700">
+              AgriSense
+            </span>
           </div>
 
           <div className="hidden md:flex gap-8 text-lg font-medium text-gray-700">
