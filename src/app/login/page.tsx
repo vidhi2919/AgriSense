@@ -8,22 +8,28 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { FirebaseError } from "firebase/app";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("Login successful:", userCredential.user);
       setLoggedIn(true);
-    } catch (error: any) {
-      alert(error.message);
-      console.error("Login error:", error.message);
+    } catch (err: unknown) {
+      if (err instanceof FirebaseError) {
+        alert(err.message);
+        console.error("Login error:", err.code, err.message);
+      } else {
+        alert("An unexpected error occurred. Please try again.");
+        console.error("Unexpected login error:", err);
+      }
     }
   };
 
