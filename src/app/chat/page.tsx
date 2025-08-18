@@ -337,7 +337,7 @@ export default function ChatPage() {
         </div>
 
         {/* subtle line like home page */}
-        <div className="absolute left-0 top-16 w-80 h-10 z-0 opacity-70">
+        <div className="absolute left-0 top-13.5 w-80 h-10 z-0 opacity-70">
           <svg width="320" height="40" viewBox="0 0 320 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path d="M0 24C80 8, 160 8, 240 24C280 32, 300 40, 320 24" stroke="#22c55e" strokeWidth="6" fill="none"/>
           </svg>
