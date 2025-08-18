@@ -77,9 +77,9 @@ export default function RootLayout({
             <Button asChild variant="ghost" className="text-lg">
               <Link href="/chat">Chat</Link>
             </Button>
-            <Button asChild variant="ghost" className="text-lg">
+            {/* <Button asChild variant="ghost" className="text-lg">
               <Link href="/services">Services</Link>
-            </Button>
+            </Button> */}
           </div>
 
           <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full px-5 text-lg">
