@@ -67,16 +67,11 @@
 //         </div>
 //       </section>
 
-   
-
-      
 //     </main>
 //   );
 // }
 
 ////with perfect img alignment////
-
-
 
 // "use client";
 
@@ -152,7 +147,6 @@
 //   It provides solutions for farm advisors and farmers with supply chain support.
 // </p>
 
-
 //     <div className="flex items-center space-x-6">
 //       <Link href="/about" passHref>
 //       <Button variant="outline" className="rounded-full px-6 text-lg">
@@ -195,50 +189,55 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   return (
     <main className="w-full overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="/h4img.jpeg"
+            alt="Farm Illustration"
+            fill={true}
+            className="object-cover object-top"
+            priority
+            sizes="100vw"
+          />
+          {/* Gradient only at bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t"></div>
+        </div>
 
-{/* Hero Section */}
-<section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden">
-  
-  {/* Background Image */}
-  <div className="absolute inset-0 -z-10">
-    <Image
-      src="/h4img.jpeg"
-      alt="Farm Illustration"
-      fill
-      className="object-cover object-top"  // 👈 Moves image upwards
-      priority
-      sizes="100vw"
-    />
-    {/* Gradient only at bottom */}
-    <div className="absolute inset-0 bg-gradient-to-t"></div>
-  </div>
+        {/* Text Content */}
+        <div className="max-w-3xl px-6">
+          <p className="text-sm tracking-wide text-gray-600 mb-4">
+            From Satellite to Soil,{" "}
+            <span className="text-green-600 font-medium">
+              Guidance You Can Trust
+            </span>
+          </p>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-4">
+            AgriSense
+          </h1>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-green-700">
+            🌱 Smarter Yields, Better Tomorrow
+          </h2>
+          <p className="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-8">
+            Every question deserves the right answer —{" "}
+            <i>Sawaalon se samadhan tak, hum hain aapke saath.</i>
+          </p>
 
-  {/* Text Content */}
-  <div className="max-w-3xl px-6">
-    <p className="text-sm tracking-wide text-gray-600 mb-4">
-      Sustainable Industry for a <span className="text-green-600 font-medium">Green Planet</span>
-    </p>
-    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-      Increasing Farm <span className="bg-green-100 px-2 rounded">Productivity</span>
-    </h1>
-
-    <p className="text-base md:text-lg lg:text-xl text-gray-700 leading-relaxed mb-8">
-      Addressing this industry's challenges means solving problems across the value chain.
-      It provides solutions for farm advisors and farmers with supply chain support.
-    </p>
-
-    <div className="flex justify-center space-x-6">
-      <Link href="/about" passHref>
-        <Button variant="outline" className="rounded-full px-6 text-lg">
-          More About
-        </Button>
-      </Link>
-      <button className="text-gray-700 hover:text-green-600 font-medium transition-colors">
-        How it Works →
-      </button>
-    </div>
-  </div>
-</section>
+          <div className="flex justify-center space-x-6">
+            <Link href="/about" passHref>
+              <Button variant="outline" className="rounded-full px-6 text-lg">
+                More About
+              </Button>
+            </Link>
+            <Link href="/chat" passHref>
+              <Button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-2xl shadow-md">
+                How it Works →
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
