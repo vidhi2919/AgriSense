@@ -1,8 +1,7 @@
 // app/chat/page.tsx
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -238,8 +237,9 @@ export default function ChatPage() {
             "Initialization complete. Synthetic EO/DEM ready; encoder built. You can start asking questions now.",
         },
       ]);
-    } catch (err: any) {
-      setInitError(err?.message || "Init failed");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Init failed";
+      setInitError(msg);
     } finally {
       setIsInitializing(false);
     }
@@ -300,12 +300,13 @@ export default function ChatPage() {
         });
         return updated;
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
       setMessages((m) => [
         ...m,
         {
           role: "assistant",
-          content: `Sorry — something went wrong: ${err?.message || "Unknown error"}`,
+          content: `Sorry — something went wrong: ${msg}`,
         },
       ]);
     } finally {
@@ -317,11 +318,8 @@ export default function ChatPage() {
     setBrowsers((b) => (b.includes(name) ? b.filter((x) => x !== name) : [...b, name]));
   }
 
-  
-
   return (
     <main className="w-full min-h-screen bg-gradient-to-b from-green-50 via-white to-white text-gray-900 overflow-hidden">
-
       {/* Header / Hero strip */}
       <section className="relative px-6 md:px-12 lg:px-20 py-10">
         <div className="max-w-5xl">
@@ -453,14 +451,14 @@ export default function ChatPage() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        if (!isSending) sendQuery();
+                        if (!isSending) void sendQuery();
                       }
                     }}
                     placeholder="Type your question… e.g., 'Mera gehu me keede lag gaye hain, kya karu?'"
                     className="w-full min-h-[52px] max-h-40 rounded-xl border border-gray-200 bg-white px-3 py-3 outline-none focus:ring-2 focus:ring-green-200"
                   />
                   <Button
-                    onClick={sendQuery}
+                    onClick={() => void sendQuery()}
                     disabled={isSending || !query.trim()}
                     className="bg-green-600 hover:bg-green-700 text-white rounded-xl px-6"
                   >
@@ -543,7 +541,7 @@ export default function ChatPage() {
 
               <div className="flex items-center gap-3 mt-4">
                 <Button
-                  onClick={handleInit}
+                  onClick={() => void handleInit()}
                   disabled={isInitializing}
                   className="bg-green-600 hover:bg-green-700 text-white rounded-full px-5"
                 >
