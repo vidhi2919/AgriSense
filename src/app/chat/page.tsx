@@ -2,12 +2,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-// Keep CSS (runtime only; no type issues)
-import "leaflet/dist/leaflet.css";
 
 /* =======================
    Types
@@ -55,112 +51,96 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE?.replace(/\/+$/, "") || "http://localhost:8000";
 
 /* =======================
-   Leaflet Map (OSM) with BBox
-   - No direct 'leaflet' import; avoids unused var + missing types.
+   Dummy Clickable BBox Map (SVG only)
+   - No leaflet, no external map libs
+   - World extent: lon [-180,180], lat [-90,90]
+   - Shift+Click sets MIN corner, normal Click sets MAX corner
 ======================= */
-const BBoxMap = dynamic(
-  async () => {
-    const { MapContainer, TileLayer, Rectangle, useMap } = await import("react-leaflet");
-    const { useCallback, useEffect } = await import("react");
+function DummyBBoxMap({
+  bbox,
+  onChange,
+  className,
+}: {
+  bbox: [number, number, number, number]; // [minX(lon), minY(lat), maxX(lon), maxY(lat)]
+  onChange: (next: [number, number, number, number]) => void;
+  className?: string;
+}) {
+  // SVG viewBox uses width=360 (lon span), height=180 (lat span)
+  // map lon,lat -> x,y in SVG:
+  //   x = lon + 180
+  //   y = 90 - lat
+  const [minX, minY, maxX, maxY] = bbox;
 
-    // Minimal structural types to avoid depending on leaflet's types
-    type LatLngBoundsTuple = [[number, number], [number, number]];
-    type LeafletMouseEventLike = {
-      latlng: { lat: number; lng: number };
-      originalEvent: { shiftKey?: boolean };
-    };
+  const rectX = minX + 180;
+  const rectY = 90 - maxY; // top-left y
+  const rectW = Math.max(0, maxX - minX);
+  const rectH = Math.max(0, maxY - minY);
 
-    function FitToBBox({ bounds }: { bounds: LatLngBoundsTuple }) {
-      const map = useMap();
-      useEffect(() => {
-        try {
-          // @ts-expect-error react-leaflet map has fitBounds at runtime
-          map.fitBounds(bounds, { padding: [20, 20] });
-        } catch {
-          /* noop */
-        }
-      }, [map, bounds]);
-      return null;
+  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = e.currentTarget;
+    const r = svg.getBoundingClientRect();
+    const px = e.clientX - r.left;
+    const py = e.clientY - r.top;
+
+    const lon = (px / r.width) * 360 - 180;
+    const lat = 90 - (py / r.height) * 180;
+
+    if (e.shiftKey) {
+      // set min corner
+      const nminX = Math.min(lon, maxX - 0.0001);
+      const nminY = Math.min(lat, maxY - 0.0001);
+      onChange([nminX, nminY, maxX, maxY]);
+    } else {
+      // set max corner
+      const nmaxX = Math.max(lon, minX + 0.0001);
+      const nmaxY = Math.max(lat, minY + 0.0001);
+      onChange([minX, minY, nmaxX, nmaxY]);
     }
+  };
 
-    function ClickToSetBBox({
-      onChange,
-      bbox,
-    }: {
-      onChange: (next: [number, number, number, number]) => void;
-      bbox: [number, number, number, number];
-    }) {
-      const map = useMap();
-      const setCorner = useCallback(
-        (e: LeafletMouseEventLike) => {
-          const lat = e.latlng.lat;
-          const lng = e.latlng.lng;
-          const [minX, minY, maxX, maxY] = bbox;
+  return (
+    <div className={className ?? "w-full h-64 rounded-xl overflow-hidden border border-gray-200"}>
+      <svg
+        viewBox="0 0 360 180"
+        className="w-full h-full"
+        onClick={handleClick}
+        role="img"
+        aria-label="Dummy world map"
+      >
+        {/* background */}
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="360" height="180" fill="#f9fafb" />
+        <rect x="0" y="0" width="360" height="180" fill="url(#grid)" />
 
-          if (e.originalEvent.shiftKey) {
-            const nminX = Math.min(lng, maxX - 0.0001);
-            const nminY = Math.min(lat, maxY - 0.0001);
-            onChange([nminX, nminY, maxX, maxY]);
-          } else {
-            const nmaxX = Math.max(lng, minX + 0.0001);
-            const nmaxY = Math.max(lat, minY + 0.0001);
-            onChange([minX, minY, nmaxX, nmaxY]);
-          }
-        },
-        [bbox, onChange]
-      );
+        {/* equator and meridians */}
+        <line x1="0" y1="90" x2="360" y2="90" stroke="#9ca3af" strokeWidth="1" opacity="0.7" />
+        <line x1="180" y1="0" x2="180" y2="180" stroke="#9ca3af" strokeWidth="1" opacity="0.7" />
 
-      useEffect(() => {
-        // @ts-expect-error map.on exists at runtime
-        map.on("click", setCorner);
-        return () => {
-          // @ts-expect-error map.off exists at runtime
-          map.off("click", setCorner);
-        };
-      }, [map, setCorner]);
+        {/* bbox rectangle */}
+        <rect
+          x={rectX}
+          y={rectY}
+          width={rectW}
+          height={rectH}
+          fill="#22c55e22"
+          stroke="#16a34a"
+          strokeWidth="2"
+          rx="2"
+          ry="2"
+        />
 
-      return null;
-    }
-
-    return function BBoxMapImpl({
-      bbox,
-      onChange,
-      className,
-    }: {
-      bbox: [number, number, number, number];
-      onChange: (next: [number, number, number, number]) => void;
-      className?: string;
-    }) {
-      const [minX, minY, maxX, maxY] = bbox; // X=lon, Y=lat
-      const bounds: LatLngBoundsTuple = [
-        [minY, minX],
-        [maxY, maxX],
-      ];
-      const center: [number, number] = [(minY + maxY) / 2, (minX + maxX) / 2];
-
-      return (
-        <MapContainer
-          center={center}
-          zoom={8}
-          className={className ?? "w-full h-64 rounded-xl overflow-hidden"}
-          scrollWheelZoom
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors'
-          />
-          <Rectangle
-            bounds={bounds as unknown as [[number, number], [number, number]]}
-            pathOptions={{ color: "#16a34a", weight: 2, fillOpacity: 0.1 }}
-          />
-          <FitToBBox bounds={bounds} />
-          <ClickToSetBBox bbox={bbox} onChange={onChange} />
-        </MapContainer>
-      );
-    };
-  },
-  { ssr: false }
-);
+        {/* instructions */}
+        <text x="8" y="14" fontSize="10" fill="#6b7280">
+          Click: set max corner • Shift+Click: set min corner
+        </text>
+      </svg>
+    </div>
+  );
+}
 
 /* =======================
    Page
@@ -180,7 +160,8 @@ export default function ChatPage() {
   // --- Init panel state ---
   const [regenerate, setRegenerate] = useState(false);
   const [bbox, setBbox] = useState<[number, number, number, number]>([
-    75.0, 23.5, 76.0, 24.5, // [minX(lon), minY(lat), maxX(lon), maxY(lat)]
+    // Rajasthan-ish dummy bbox: [minLon, minLat, maxLon, maxLat]
+    75.0, 23.5, 76.0, 24.5,
   ]);
   const [resDeg, setResDeg] = useState(0.01);
   const [initResult, setInitResult] = useState<InitResponse | null>(null);
@@ -520,15 +501,15 @@ export default function ChatPage() {
                 </div>
               </div>
 
-              {/* OSM Map with BBox rectangle */}
+              {/* Dummy Map with BBox rectangle */}
               <div className="space-y-2">
                 <div className="text-xs text-gray-500">
-                  Map (OpenStreetMap). <kbd className="px-1 py-0.5 rounded bg-gray-100">Click</kbd> to set{" "}
+                  Map (dummy). <kbd className="px-1 py-0.5 rounded bg-gray-100">Click</kbd> to set{" "}
                   <span className="font-medium">max</span> corner •{" "}
                   <kbd className="px-1 py-0.5 rounded bg-gray-100">Shift + Click</kbd> to set{" "}
                   <span className="font-medium">min</span> corner.
                 </div>
-                <BBoxMap
+                <DummyBBoxMap
                   bbox={bbox}
                   onChange={(next) => setBbox(next)}
                   className="w-full h-64 rounded-xl overflow-hidden border border-gray-200"
