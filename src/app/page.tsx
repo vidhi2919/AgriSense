@@ -238,6 +238,16 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <section className="px-6 md:px-20 py-20 text-center bg-gradient-to-r from-green-600 to-green-700 text-white">
+        <h2 className="text-3xl font-bold mb-6">Join the AgriSense Movement</h2>
+        <p className="max-w-2xl mx-auto mb-8 text-lg text-green-100">
+          Be part of the agricultural revolution. Whether you’re a farmer,
+          partner, or supporter — together we can make farming smarter.
+        </p>
+        <Button className="bg-white text-green-700 hover:bg-green-100 rounded-full px-8 py-3 text-lg">
+          Get Involved
+        </Button>
+      </section>
     </main>
   );
 }
