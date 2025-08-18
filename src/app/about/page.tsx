@@ -1,5 +1,6 @@
 // app/about/page.tsx
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -7,7 +8,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-green-50 via-white to-white text-gray-900">
       {/* Navbar */}
-      <nav className="flex justify-between items-center px-8 py-5 bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
+      {/* <nav className="flex justify-between items-center px-8 py-5 bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-green-600 rounded-full"></div>
           <span className="font-bold text-xl tracking-tight">AgriSense</span>
@@ -21,7 +22,35 @@ export default function HomePage() {
         <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full px-5">
           Sign In
         </Button>
-      </nav>
+      </nav> */}
+      <nav className="flex justify-between items-center px-8 py-5 bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
+      {/* Logo */}
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 bg-green-600 rounded-full"></div>
+        <span className="font-bold text-xl tracking-tight">AgriSense</span>
+      </div>
+
+      {/* Nav links */}
+      <div className="hidden md:flex gap-8 text-lg font-medium text-gray-700">
+        <Button asChild variant="ghost" className="text-lg">
+          <Link href="/">Home</Link>
+        </Button>
+        <Button asChild variant="ghost" className="text-lg">
+          <Link href="/about">About Us</Link>
+        </Button>
+        <Button asChild variant="ghost" className="text-lg">
+          <Link href="/gallery">Gallery</Link>
+        </Button>
+        <Button asChild variant="ghost" className="text-lg">
+          <Link href="/services">Services</Link>
+        </Button>
+      </div>
+
+      {/* Sign in */}
+      <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full px-5 text-lg">
+        Sign In
+      </Button>
+    </nav>
 
       {/* Hero Section */}
       <section className="px-6 md:px-20 py-20 text-center relative overflow-hidden">
@@ -245,9 +274,9 @@ export default function HomePage() {
         </div>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {[
-            { name: "Dhruv Dawar", role: "AI/ML Research" },
-            { name: "Vidhi Arora", role: "Design & UX" },
-            { name: "Pari Gupta", role: "Field Research" },
+            { name: "Dhruv Dawar"},
+            { name: "Vidhi Arora"},
+            { name: "Pari Gupta"},
           ].map((member, idx) => (
             <Card
               key={idx}
@@ -255,7 +284,7 @@ export default function HomePage() {
             >
               <div className="w-20 h-20 bg-green-100 mx-auto rounded-full mb-4" />
               <p className="font-semibold">{member.name}</p>
-              <p className="text-gray-600 text-sm">{member.role}</p>
+              {/* <p className="text-gray-600 text-sm">{member.role}</p> */}
             </Card>
           ))}
         </div>
