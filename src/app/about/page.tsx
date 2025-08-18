@@ -23,34 +23,6 @@ export default function HomePage() {
           Sign In
         </Button>
       </nav> */}
-      <nav className="flex justify-between items-center px-8 py-5 bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
-      {/* Logo */}
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 bg-green-600 rounded-full"></div>
-        <span className="font-bold text-xl tracking-tight">AgriSense</span>
-      </div>
-
-      {/* Nav links */}
-      <div className="hidden md:flex gap-8 text-lg font-medium text-gray-700">
-        <Button asChild variant="ghost" className="text-lg">
-          <Link href="/">Home</Link>
-        </Button>
-        <Button asChild variant="ghost" className="text-lg">
-          <Link href="/about">About Us</Link>
-        </Button>
-        <Button asChild variant="ghost" className="text-lg">
-          <Link href="/gallery">Gallery</Link>
-        </Button>
-        <Button asChild variant="ghost" className="text-lg">
-          <Link href="/services">Services</Link>
-        </Button>
-      </div>
-
-      {/* Sign in */}
-      <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full px-5 text-lg">
-        Sign In
-      </Button>
-    </nav>
 
       {/* Hero Section */}
       <section className="px-6 md:px-20 py-20 text-center relative overflow-hidden">
