@@ -655,6 +655,13 @@ export default function ChatPage() {
         <Button className="bg-white text-green-700 hover:bg-green-100 rounded-full px-8 py-3 text-lg">
           Start Asking
         </Button>
+        <Button
+  className="bg-white text-green-700 hover:bg-green-100 rounded-full px-8 py-3 text-lg"
+  onClick={() => window.open("https://wa.me/14155238886", "_blank")}
+>
+  Whatsapp Bot
+</Button>
+
       </section>
     </main>
   );
