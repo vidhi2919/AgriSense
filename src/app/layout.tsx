@@ -36,6 +36,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
+import { FaWhatsapp } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 
