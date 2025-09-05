@@ -89,6 +89,15 @@ export default function RootLayout({
 
         {/* Page Content */}
         {children}
+        {/* Floating WhatsApp Button */}
+        <a
+          href="https://wa.me/911234567890" // 👈 replace with your WhatsApp number
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center"
+        >
+          <FaWhatsapp size={50} />
+        </a>
       </body>
     </html>
   );
